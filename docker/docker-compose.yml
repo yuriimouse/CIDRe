@@ -1,0 +1,9 @@
+services:
+  cidre-lib:
+    container_name: cidre
+    build: .
+    volumes:
+      - ../:/cidre
+    entrypoint: /bin/bash
+    stdin_open: true
+    tty: true
