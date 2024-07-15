@@ -1,4 +1,15 @@
+/**
+ * @file cidre.c
+ * @author Yurii Prudius (yurii.prudius@gmail.com) [https://github.com/yuriimouse/CIDRe]
+ * @brief Easy IPv4 CIDR manipulation
+ * @version 1.2.1
+ * @date 2024-07-15
+ * 
+ * @copyright Copyright (c) 2024
+ * 
+ */
 #include "cidre.h"
+#include <arpa/inet.h>
 #include <ctype.h>
 #include <errno.h>
 
@@ -7,21 +18,21 @@ typedef union CIDRe // CIDR construction
     CIDRe full; // full representation
     struct      // parts representation
     {
-        union // address part
+        unsigned char type;     // CIDR is special (see [https://en.wikipedia.org/wiki/Private_network] and 0.0.0.0/0)
+        unsigned char version;  // version
+        unsigned char reserved; // reserved
+        unsigned char mask;     // CIDR mask
+        union                   // address part
         {
             uint32_t packed; // packed
             struct           // unpacked elements
             {
-                unsigned char a;
-                unsigned char b;
-                unsigned char c;
                 unsigned char d;
+                unsigned char c;
+                unsigned char b;
+                unsigned char a;
             } element;
         } address;
-        unsigned char mask;     // CIDR mask
-        unsigned char reserved; // reserved
-        unsigned char version;  // version
-        unsigned char type;     // CIDR is special (see [https://en.wikipedia.org/wiki/Private_network] and 0.0.0.0/0)
     } part;
 } CIDReasy;
 
@@ -46,26 +57,31 @@ CIDRe CIDRe_create(const char *str)
 
     if (str)
     {
+        int mask = 32;
         unsigned int a = 0;
         unsigned int b = 0;
         unsigned int c = 0;
         unsigned int d = 0;
-        char *strmask = NULL;
-        sscanf(str, "%u.%u.%u.%u/%ms", &a, &b, &c, &d, &strmask);
+        int n = 0;
+        sscanf(str, "%u.%u.%u.%u%n", &a, &b, &c, &d, &n);
 
-        int mask = (strmask && isdigit(strmask[0])) ? atoi(strmask) : 32;
-        if (strmask)
+        if (n)
         {
-            free(strmask);
+            if ('/' == str[n])
+            {
+                mask = (isdigit(str[n + 1])) ? atoi(str + n + 1) : -1;
+            }
+            if (mask >= 0)
+            {
+                CIDReasy_SET_ELEMENT(result, a);
+                CIDReasy_SET_ELEMENT(result, b);
+                CIDReasy_SET_ELEMENT(result, c);
+                CIDReasy_SET_ELEMENT(result, d);
+
+                result.part.mask = 32; // prevents the CIDR mask from increasing
+                return CIDRe_mask(result.full, mask);
+            }
         }
-
-        CIDReasy_SET_ELEMENT(result, a);
-        CIDReasy_SET_ELEMENT(result, b);
-        CIDReasy_SET_ELEMENT(result, c);
-        CIDReasy_SET_ELEMENT(result, d);
-
-        result.part.mask = 32; // prevents the CIDR mask from increasing
-        return CIDRe_mask(result.full, mask);
     }
 
     errno = EINVAL;
@@ -84,52 +100,61 @@ CIDRe CIDRe_mask(CIDRe src, int mask)
     CIDReasy easy;
     easy.full = src;
 
-    if (mask >= 0 && mask < 33 && mask <= easy.part.mask)
+    if (src)
     {
-        easy.part.mask = (unsigned char)(mask);
-    }
-    else
-    {
-        errno = EINVAL;
-        return 0;
-    }
+        if (mask >= 0 && mask < 33 && mask <= easy.part.mask)
+        {
+            easy.part.mask = (unsigned char)(mask);
+        }
+        else
+        {
+            errno = EINVAL;
+            return 0;
+        }
 
-    easy.part.address.packed &= UINT32_MAX << (32 - mask);
+        if (mask)
+        {
+            easy.part.address.packed &= UINT32_MAX << (32 - mask);
+        }
+        else
+        {
+            easy.part.address.packed = 0;
+        }
 
-    // checks the type of result
-    if (0 == easy.part.address.element.a)
-    {
-        easy.full = 0;
-        easy.part.type = '0'; // 0.0.0.0/0
-    }
-    else if (10 == easy.part.address.element.a)
-    {
-        easy.part.type = 'A'; // 10.0.0.0/8
-    }
-    else if (127 == easy.part.address.element.a)
-    {
-        easy.part.type = 'L'; // 127.0.0.0/8
-    }
-    else if (100 == easy.part.address.element.a && 64 == easy.part.address.element.b)
-    {
-        easy.part.type = 'N'; // 100.64.0.0/10
-    }
-    else if (172 == easy.part.address.element.a && 16 == easy.part.address.element.b)
-    {
-        easy.part.type = 'B'; // 172.16.0.0/12
-    }
-    else if (192 == easy.part.address.element.a && 168 == easy.part.address.element.b)
-    {
-        easy.part.type = 'C'; // 192.168.0.0/16
-    }
-    else if (169 == easy.part.address.element.a && 254 == easy.part.address.element.b)
-    {
-        easy.part.type = 'R'; // 169.254.0.0/16
-    }
+        // checks the type of result
+        if (0 == easy.part.address.element.a)
+        {
+            easy.part.type = '0'; // 0.0.0.0/0
+        }
+        else if (10 == easy.part.address.element.a)
+        {
+            easy.part.type = 'A'; // 10.0.0.0/8
+        }
+        else if (127 == easy.part.address.element.a)
+        {
+            easy.part.type = 'L'; // 127.0.0.0/8
+        }
+        else if (100 == easy.part.address.element.a && 64 == easy.part.address.element.b)
+        {
+            easy.part.type = 'N'; // 100.64.0.0/10
+        }
+        else if (172 == easy.part.address.element.a && 16 == easy.part.address.element.b)
+        {
+            easy.part.type = 'B'; // 172.16.0.0/12
+        }
+        else if (192 == easy.part.address.element.a && 168 == easy.part.address.element.b)
+        {
+            easy.part.type = 'C'; // 192.168.0.0/16
+        }
+        else if (169 == easy.part.address.element.a && 254 == easy.part.address.element.b)
+        {
+            easy.part.type = 'R'; // 169.254.0.0/16
+        }
 
 #ifdef VERSION
-    easy.part.version = (unsigned char)atoi(VERSION);
+        easy.part.version = (unsigned char)atoi(VERSION);
 #endif
+    }
 
     return easy.full;
 }
@@ -195,7 +220,7 @@ int CIDRe_contains(CIDRe larger, CIDRe smaller)
         if (e_larger.part.mask <= e_smaller.part.mask)
         {
             e_smaller.full = CIDRe_mask(e_smaller.full, e_larger.part.mask);
-            return !(e_larger.part.address.packed ^ e_larger.part.address.packed);
+            return !(e_larger.part.address.packed ^ e_smaller.part.address.packed);
         }
     }
 

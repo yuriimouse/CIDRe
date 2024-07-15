@@ -13,7 +13,10 @@ STATIC_LIB = lib$(LIB_NAME).a
 TARGET_LIB = lib$(LIB_NAME).so
 
 .PHONY: default
-default: clean $(TARGET_LIB)
+default: all clean
+.PHONY: all
+all: $(TARGET_LIB)
+
 
 OBJECTS = $(patsubst %.c, %.o, $(wildcard *.c))
 
@@ -30,7 +33,10 @@ clean:
 	rm -f $(TARGET_LIB) $(STATIC_LIB)
 
 .PHONY: install
-install: default
+install: all clean
+	/bin/mkdir -p $(INSTALL_PATH)include/$(LIB_NAME)/
+	cp -f *.h $(INSTALL_PATH)include/$(LIB_NAME)/
+	/bin/mkdir -p $(INSTALL_PATH)lib/
 	cp -f $(TARGET_LIB) $(INSTALL_PATH)lib/
 	cp -f $(STATIC_LIB) $(INSTALL_PATH)lib/
 
