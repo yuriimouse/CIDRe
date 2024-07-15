@@ -1,2 +1,2 @@
 # CIDRe
-Easy manipulation of IPv4 CIDR
+Easy IPv4 CIDR manipulation
