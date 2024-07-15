@@ -17,7 +17,6 @@ default: all clean
 .PHONY: all
 all: $(TARGET_LIB)
 
-
 OBJECTS = $(patsubst %.c, %.o, $(wildcard *.c))
 
 %.o: %.c
@@ -33,7 +32,9 @@ clean:
 	rm -f $(TARGET_LIB) $(STATIC_LIB)
 
 .PHONY: install
-install: all clean
+install: all copy clean
+.PHONY: copy
+copy:
 	/bin/mkdir -p $(INSTALL_PATH)include/$(LIB_NAME)/
 	cp -f *.h $(INSTALL_PATH)include/$(LIB_NAME)/
 	/bin/mkdir -p $(INSTALL_PATH)lib/

@@ -9,7 +9,6 @@
  * 
  */
 #include "cidre.h"
-#include <arpa/inet.h>
 #include <ctype.h>
 #include <errno.h>
 
