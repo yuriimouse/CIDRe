@@ -1,4 +1,0 @@
-[submodule "CUnit"]
-	path = CUnit
-	url = https://github.com/jacklicn/CUnit.git
-    ignore = dirty
