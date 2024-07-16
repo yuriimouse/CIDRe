@@ -6,8 +6,10 @@ RUN dnf install gcc -y
 RUN dnf install epel-release -y
 RUN dnf install make -y
 RUN dnf install findutils -y
-# unittest
-RUN dnf install libtool -y
+#
+RUN dnf install 'dnf-command(config-manager)'
+RUN dnf config-manager --set-enabled powertools# unittest
+# RUN dnf install libtool -y
 RUN dnf install unittest* -y
 # git
 RUN dnf install git -y
