@@ -1,13 +1,13 @@
-# Makefile
 VERSION = 1.2.2
 
-# # Library name
+# Library name
 LIB_NAME = cidre
-# # Install path
+
+# Installation prefix
 INSTALL_PATH ?= /usr/local/
 
 CC = gcc
-CFLAGS = -fPIC -Wall -Wextra -O2 -g -std=gnu99 -DVERSION=\"$(VERSION)\" -I$(INSTALL_PATH) -I/usr/include 
+CFLAGS = -fPIC -Wall -Wextra -O2 -g -std=gnu99 -DVERSION=\"$(VERSION)\" -I./include -I/usr/include
 LDFLAGS = -shared
 
 STATIC_LIB = lib$(LIB_NAME).a
@@ -15,29 +15,35 @@ TARGET_LIB = lib$(LIB_NAME).so
 
 .PHONY: default all clean install copy
 
-default: all clean
+# Default target: build only
+default: all
 
+# Build both shared and static libraries
 all: $(TARGET_LIB)
 
+# Collect object files from all .c files
 OBJECTS = $(patsubst %.c, %.o, $(wildcard *.c))
 
+# Compile .c files into .o files
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
+# Build shared and static libraries
 $(TARGET_LIB): $(OBJECTS)
-	$(CC) ${LDFLAGS} -o $@ $^
+	$(CC) $(LDFLAGS) -o $@ $^
 	ar rcs $(STATIC_LIB) $(OBJECTS)
 
+# Remove generated files
 clean:
-	rm -f *.o
-	rm -f $(TARGET_LIB) $(STATIC_LIB)
+	rm -f *.o $(TARGET_LIB) $(STATIC_LIB)
 
-install: all copy clean
+# Full install process: build, copy, set permissions
+install: all copy
 
+# Install headers and libraries using 'install' command
 copy:
-	/bin/mkdir -p $(INSTALL_PATH)include/$(LIB_NAME)/
-	cp -f *.h $(INSTALL_PATH)include/$(LIB_NAME)/
-	/bin/mkdir -p $(INSTALL_PATH)lib/
-	cp -f $(TARGET_LIB) $(INSTALL_PATH)lib/
-	cp -f $(STATIC_LIB) $(INSTALL_PATH)lib/
-
+	install -d $(INSTALL_PATH)include/$(LIB_NAME)
+	install -m 644 *.h $(INSTALL_PATH)include/$(LIB_NAME)
+	install -d $(INSTALL_PATH)lib
+	install -m 755 $(TARGET_LIB) $(INSTALL_PATH)lib
+	install -m 644 $(STATIC_LIB) $(INSTALL_PATH)lib

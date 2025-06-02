@@ -1,0 +1,31 @@
+name: CIDRe CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential valgrind libcunit1 libcunit1-doc libcunit1-dev
+
+    - name: Build library
+      working-directory: sources
+      run: |
+        make
+
+    - name: Build and run tests under valgrind
+      working-directory: tests
+      run: |
+        make
+        make run
