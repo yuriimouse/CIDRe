@@ -4,7 +4,7 @@ VERSION = 1.2.2
 # # Library name
 LIB_NAME = cidre
 # # Install path
-INSTALL_PATH = /usr/local/
+INSTALL_PATH ?= /usr/local/
 
 CC = gcc
 CFLAGS = -fPIC -Wall -Wextra -O2 -g -std=gnu99 -DVERSION=\"$(VERSION)\" -I$(INSTALL_PATH) -I/usr/include 

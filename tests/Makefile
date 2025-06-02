@@ -1,10 +1,12 @@
 VERSION = 1.2.2
 
+INSTALL_PATH ?= /usr/local/
+
 CC = gcc
-CFLAGS = -fPIC -Wall -Wextra -O2 -g -std=gnu99 -DVERSION=\"$(VERSION)\" -I/usr/local/include -I/usr/include 
+CFLAGS = -fPIC -Wall -Wextra -O2 -g -std=gnu99 -DVERSION=\"$(VERSION)\" -I$(INSTALL_PATH)include -I/usr/include 
 LDFLAGS = -fpie -L/usr/local/lib/
 
-S_LIBS = -Wl,-Bstatic -lcunit -lcidre
+S_LIBS = -Wl,-Bstatic -lcunit -L$(INSTALL_PATH)lib -lcidre
 D_LIBS = -Wl,-Bdynamic -lpthread -lresolv
 TARGET_BIN = unitTest
 
