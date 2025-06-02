@@ -1,4 +1,5 @@
-VERSION = 1.2.1
+# Makefile
+VERSION = 1.2.2
 
 # # Library name
 LIB_NAME = cidre
@@ -12,9 +13,10 @@ LDFLAGS = -shared
 STATIC_LIB = lib$(LIB_NAME).a
 TARGET_LIB = lib$(LIB_NAME).so
 
-.PHONY: default
+.PHONY: default all clean install copy
+
 default: all clean
-.PHONY: all
+
 all: $(TARGET_LIB)
 
 OBJECTS = $(patsubst %.c, %.o, $(wildcard *.c))
@@ -26,14 +28,12 @@ $(TARGET_LIB): $(OBJECTS)
 	$(CC) ${LDFLAGS} -o $@ $^
 	ar rcs $(STATIC_LIB) $(OBJECTS)
 
-.PHONY: clean
 clean:
 	rm -f *.o
 	rm -f $(TARGET_LIB) $(STATIC_LIB)
 
-.PHONY: install
 install: all copy clean
-.PHONY: copy
+
 copy:
 	/bin/mkdir -p $(INSTALL_PATH)include/$(LIB_NAME)/
 	cp -f *.h $(INSTALL_PATH)include/$(LIB_NAME)/

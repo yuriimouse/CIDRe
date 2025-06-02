@@ -17,15 +17,16 @@ static void test_CIDRe_create(void)
     char *source = NULL;
     char *estimate = NULL;
 
-    printf("\n%s\n", __func__);
+    fprintf(stderr, "\n%s\n", __func__);
     START_USING_TEST_DATA("data/")
     {
-        USE_OF_THE_TEST_DATA("%ms = %ms", &source, &estimate)
+        USE_OF_THE_TEST_DATA("%ms = %ms", &source, &estimate);
 
         CIDRe cidr = CIDRe_create(source);
         char *buff = NULL;
-        asprintf(&buff, "%016llx", cidr);
-        printf("%s=%s::%s\n", source, estimate, buff);
+        int res = asprintf(&buff, "%016llx", (long long unsigned int)cidr);
+        (void)res;
+        fprintf(stderr, "%s(%s)::%s=%s\n", __func__, source, estimate, buff);
         CU_ASSERT_STRING_EQUAL(estimate, buff);
 
         FREE_AND_NULL(buff);

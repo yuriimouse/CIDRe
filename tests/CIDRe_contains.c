@@ -17,13 +17,13 @@ static void test_CIDRe_contains(void)
     char *small = NULL;
     int estimate = 0;
 
-    printf("\n%s\n", __func__);
+    fprintf(stderr, "\n%s\n", __func__);
     START_USING_TEST_DATA("data/")
     {
-        USE_OF_THE_TEST_DATA("%ms : %ms = %d", &big, &small, &estimate)
+        USE_OF_THE_TEST_DATA("%ms : %ms = %d", &big, &small, &estimate);
 
         int actual = CIDRe_contains(CIDRe_create(big), CIDRe_create(small));
-        printf("%s:%s=%d::%d\n", big, small, estimate, actual);
+        fprintf(stderr, "%s(%s,%s)::%d=%d\n", __func__, big, small, estimate, actual);
         CU_ASSERT_EQUAL(estimate, actual);
 
         // FREE_AND_NULL(actual);

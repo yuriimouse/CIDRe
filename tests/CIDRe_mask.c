@@ -17,14 +17,14 @@ static void test_CIDRe_mask(void)
     int mask = 0;
     char *estimate = NULL;
 
-    printf("\n%s\n", __func__);
+    fprintf(stderr, "\n%s\n", __func__);
     START_USING_TEST_DATA("data/")
     {
-        USE_OF_THE_TEST_DATA("%ms : %d = %ms", &source, &mask, &estimate)
+        USE_OF_THE_TEST_DATA("%ms : %d = %ms", &source, &mask, &estimate);
 
         CIDRe cidr = CIDRe_create(source);
         char *actual = CIDRe_string(CIDRe_mask(cidr, mask));
-        printf("%s:%d=%s::%s\n", source, mask, estimate, actual);
+        fprintf(stderr, "%s(%s,%d)::%s=%s\n", __func__, source, mask, estimate, actual);
         if (actual)
         {
             CU_ASSERT_STRING_EQUAL(estimate, actual);

@@ -1,12 +1,12 @@
 /**
  * @file cidre.c
- * @author Yurii Prudius (yurii.prudius@gmail.com) [https://github.com/yuriimouse/CIDRe]
+ * @author [https://github.com/yuriimouse/CIDRe]
  * @brief Easy IPv4 CIDR manipulation
- * @version 1.2.1
+ * @version 1.2.2
  * @date 2024-07-15
- * 
+ *
  * @copyright Copyright (c) 2024
- * 
+ *
  */
 #include "cidre.h"
 #include <ctype.h>
@@ -172,7 +172,13 @@ char *CIDRe_string(CIDRe src)
         CIDReasy e;
         e.full = src;
         char *buff = NULL;
-        asprintf(&buff, "%d.%d.%d.%d/%d", e.part.address.element.a, e.part.address.element.b, e.part.address.element.c, e.part.address.element.d, e.part.mask);
+        int res = asprintf(&buff, "%d.%d.%d.%d/%d",
+                           e.part.address.element.a,
+                           e.part.address.element.b,
+                           e.part.address.element.c,
+                           e.part.address.element.d,
+                           e.part.mask);
+        (void)res;
         return buff;
     }
     errno = EINVAL;
@@ -193,7 +199,12 @@ char *CIDRe_address(CIDRe src)
         CIDReasy e;
         e.full = src;
         char *buff = NULL;
-        asprintf(&buff, "%d.%d.%d.%d", e.part.address.element.a, e.part.address.element.b, e.part.address.element.c, e.part.address.element.d);
+        int res = asprintf(&buff, "%d.%d.%d.%d",
+                           e.part.address.element.a,
+                           e.part.address.element.b,
+                           e.part.address.element.c,
+                           e.part.address.element.d);
+        (void)res;
         return buff;
     }
 

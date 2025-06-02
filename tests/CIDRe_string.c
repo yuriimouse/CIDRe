@@ -16,14 +16,14 @@ static void test_CIDRe_string(void)
     char *source = NULL;
     char *estimate = NULL;
 
-    printf("\n%s\n", __func__);
+    fprintf(stderr, "\n%s\n", __func__);
     START_USING_TEST_DATA("data/")
     {
-        USE_OF_THE_TEST_DATA("%ms = %ms", &source, &estimate)
+        USE_OF_THE_TEST_DATA("%ms = %ms", &source, &estimate);
 
         CIDRe cidr = CIDRe_create(source);
         char *actual = CIDRe_string(cidr);
-        printf("%s=%s::%s\n", source, estimate, actual);
+        fprintf(stderr, "%s(%s)::%s=%s\n", __func__, source, estimate, actual);
         if (actual)
         {
             CU_ASSERT_STRING_EQUAL(estimate, actual);

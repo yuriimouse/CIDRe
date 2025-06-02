@@ -1,14 +1,14 @@
-VERSION = 1.1.1
+VERSION = 1.2.2
 
 CC = gcc
-CFLAGS = -fPIC -Wall -Wextra -O2 -g -std=gnu99 -DVERSION=\"$(VERSION)\" -I$(INSTALL_PATH) -I/usr/include 
-LDFLAGS = -fpie -L$(LIB_PATH)lib/
+CFLAGS = -fPIC -Wall -Wextra -O2 -g -std=gnu99 -DVERSION=\"$(VERSION)\" -I/usr/local/include -I/usr/include 
+LDFLAGS = -fpie -L/usr/local/lib/
 
 S_LIBS = -Wl,-Bstatic -lcunit -lcidre
 D_LIBS = -Wl,-Bdynamic -lpthread -lresolv
 TARGET_BIN = unitTest
 
-.PHONY: default
+.PHONY: default clean
 default: $(TARGET_BIN) clean
 
 OBJECTS = $(patsubst %.c, %.o, $(wildcard *.c))
@@ -19,6 +19,5 @@ OBJECTS = $(patsubst %.c, %.o, $(wildcard *.c))
 $(TARGET_BIN): $(OBJECTS)
 	$(CC) ${LDFLAGS} -o $@ $(OBJECTS) $(S_LIBS) $(D_LIBS)
 
-.PHONY: clean
 clean:
 	rm -f *.o
