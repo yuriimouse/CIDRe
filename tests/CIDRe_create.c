@@ -25,8 +25,8 @@ static void test_CIDRe_create(void)
         CIDRe cidr = CIDRe_create(source);
         char *buff = NULL;
         int res = asprintf(&buff, "%016llx", (long long unsigned int)cidr);
-        (void)res;
         fprintf(stderr, "%s(%s)::%s=%s\n", __func__, source, estimate, buff);
+        CU_ASSERT_TRUE_FATAL(res >= 0);
         CU_ASSERT_STRING_EQUAL(estimate, buff);
 
         FREE_AND_NULL(buff);

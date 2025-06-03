@@ -1,6 +1,6 @@
 #ifndef UNIT_TEST_DEFS_H
 #define UNIT_TEST_DEFS_H
-
+// test/defines.h
 #define _GNU_SOURCE
 
 /**
@@ -26,7 +26,7 @@
         FILE *_fp;                                                                        \
         char *_pathstr = NULL;                                                            \
         int _write = asprintf(&_pathstr, "%s%s", (path), __func__);                       \
-        (void)_write;                                                                      \
+        (void)_write;                                                                     \
         char *DATA_PATH = _pathstr;                                                       \
         if (DATA_PATH && (_fp = fopen(DATA_PATH, "r")))                                   \
         {                                                                                 \
